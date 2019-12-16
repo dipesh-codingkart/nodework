@@ -1,0 +1,182 @@
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Quiz</title>
+  <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+  <div class="container">
+      <a href='/admin'>Home</a>
+      <a href='/logout'>Logout</a>
+    <h2>Question Answer List</h2>
+		<button class="btn btn-success" data-toggle="modal" data-target="#myModalAdd">Add New</button>
+    <table class="table table-striped" id="mytable">
+      <thead>
+        <tr>
+          <th>S.No.</th>
+          <th>Question</th>
+          <th>A1</th>
+          <th>A2</th>
+          <th>A3</th>
+          <th>A4</th>
+          <th>Answer</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+          <% results.forEach((student) => { %>
+        <tr>
+          <td><%= student.quiz_id %></td>
+          <td><%= student.question %></td>
+          <td><%= student.a1 %></td>
+          <td><%= student.a2 %></td>
+          <td><%= student.a3 %></td>
+          <td><%= student.a4 %></td>
+          <td><%= student.answer %></td>
+          <td>
+            <a href="javascript:void(0);" class="btn btn-sm btn-info edit" data-id="<%= student.quiz_id %>" data-question="<%= student.question %>" data-a1="<%= student.a1 %>" data-a2="<%= student.a2 %>" data-a3="<%= student.a3 %>" data-a4="<%= student.a4 %>" data-answer="<%= student.answer %>" >Edit</a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-danger delete" data-id="<%= student.quiz_id %>">Delete</a>
+          </td>
+        </tr>
+         <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+	<!-- Add New Product Modal-->
+	  <form action="/save" method="post">
+        <div class="modal fade" id="myModalAdd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+         <div class="modal-dialog" role="document">
+           <div class="modal-content">
+             <div class="modal-header">
+               <h5 class="modal-title" id="exampleModalLabel">Add New Quiz</h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                 <span aria-hidden="true">&times;</span>
+               </button>
+             </div>
+             <div class="modal-body">
+                <div class="form-group">
+                    <input type="text" name="question" class="form-control" placeholder="Question Name" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="a1" class="form-control" placeholder="A" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="a2" class="form-control" placeholder="B" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="a3" class="form-control" placeholder="C" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="a4" class="form-control" placeholder="D" required>
+                </div>
+                <div class="form-group">
+                    <input type="text" name="answer" class="form-control" placeholder="Answer" required>
+                </div>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               <button type="submit" class="btn btn-primary">Save</button>
+             </div>
+           </div>
+         </div>
+        </div>
+	 </form>
+
+	 <!-- Edit Product Modal-->
+   <form action="/update" method="post">
+       <div class="modal fade" id="EditModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Edit Product</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                  <input type="text" name="question" class="form-control question" placeholder="Question" required>
+              </div>
+
+              <div class="form-group">
+                  <input type="text" name="a1" class="form-control a1" placeholder="A" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" name="a2" class="form-control a2" placeholder="B" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" name="a3" class="form-control a3" placeholder="C" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" name="a4" class="form-control a4" placeholder="D" required>
+              </div>
+              <div class="form-group">
+                  <input type="text" name="answer" class="form-control answer" placeholder="Answer" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <input type="hidden" name="id" class="quiz_id">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="submit" class="btn btn-primary">Update</button>
+            </div>
+          </div>
+        </div>
+       </div>
+  </form>
+
+	 <!-- Delete Product Modal-->
+ 	  <form id="add-row-form" action="/delete" method="post">
+ 	     <div class="modal fade" id="DeleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+ 	        <div class="modal-dialog">
+ 	           <div class="modal-content">
+ 	               <div class="modal-header">
+									 	<h5 class="modal-title" id="myModalLabel">Delete Product</h5>
+ 	                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+ 	               </div>
+ 	               <div class="modal-body">
+												 <strong>Are You Sure To Delete This Data?</strong>
+ 	               </div>
+ 	               <div class="modal-footer">
+									 		<input type="hidden" name="quiz_id" class="form-control quiz_id2" required>
+ 	                   	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+ 	                  	<button type="submit" class="btn btn-success">Delete</button>
+ 	               </div>
+ 	      			</div>
+ 	        </div>
+ 	     </div>
+ 	 </form>
+
+<script src="/assets/js/jquery-3.3.1.js"></script>
+<script src="/assets/js/bootstrap.js"></script>
+<script>
+    $(document).ready(function(){
+			//showing data to modal for edit record
+      $('#mytable').on('click','.edit',function(){
+        var quiz_id = $(this).data('id');
+        var question = $(this).data('question');
+        var a1 = $(this).data('a1');
+        var a2 = $(this).data('a2');
+        var a3 = $(this).data('a3');
+        var a4 = $(this).data('a4');
+        var answer = $(this).data('answer');
+        $('#EditModal').modal('show');
+        $('.question').val(question);
+        $('.a1').val(a1);
+        $('.a2').val(a2);
+        $('.a3').val(a3);
+        $('.a4').val(a4);
+        $('.answer').val(answer);
+        $('.quiz_id').val(quiz_id);
+      });
+			//showing modal for delete record
+			$('#mytable').on('click','.delete',function(){
+        var quiz_id = $(this).data('id');
+        $('#DeleteModal').modal('show');
+        $('.quiz_id2').val(quiz_id);
+      });
+
+    });
+</script>
+</body>
+</html>
