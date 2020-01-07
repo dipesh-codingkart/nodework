@@ -1,0 +1,54 @@
+
+        <div class="row">
+            
+              <div class="col-md-8 card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Result</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  	<%  total_ques=0; attempt_ques=0; correct_ans=0;  %>
+
+                  	<% if(data_result){
+
+                  		total_ques=data_result.total_answer;
+                  		attempt_ques =data_result.attempt_ques;
+                  		correct_ans =data_result.correct_ans;
+
+                  	 %>
+
+
+                  	<% } %>
+                  
+                     <div class="card-body">
+                     	<div class="row">
+                     		<div class="col-md-6">
+			                    <div class="form-group">
+			                        <label for="">Total Questions:</label>
+			                        <label for=""><%= total_ques %></label>
+			                    </div>
+			                    <div class="form-group">
+			                        <label for="">Attempt Questions:</label>
+			                        <label for=""><%= attempt_ques %></label>
+			                    </div> 
+			                </div>
+			                <div class="col-md-6">
+ 			                    <div class="form-group">
+			                        <label for="">Correct Answer:</label>
+			                        <label for=""><%= correct_ans %></label>
+			                    </div> 
+			               	</div>
+		               	</div>
+                     
+                    </div>
+                    <!-- /.card-body -->
+ 
+              </div>
+             <!-- /.card -->
+        
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </div>
+    <!-- /.content -->
+
+

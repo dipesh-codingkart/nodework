@@ -1,0 +1,206 @@
+<html>
+<head>
+  <title>Front Test</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+<body onload="countdown();">
+  <div style="margin:100px;">
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container">
+        <ul class="nav navbar-nav">
+          <li class="active">
+			<a href="/test">Home</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="jumbotron"  style="padding:40px;">
+		<% if (data) { count=1  %>
+			<h1>Test Start</h1>
+			<%  data.forEach(function(quizdata){ %>
+				<div class="questshow_<%= count %>" <% if(count==1) { %> style="display:block;" <% } else { %> style="display:none;" <% } %> >
+					<p>Quesion : <%= count %> <%= quizdata.question %>&nbsp;&nbsp;&nbsp;Time : 
+					<input type="hidden" class="queiddata<%= count %>" value="<%= quizdata.qa_id %>">
+					<input type="hidden" class="perquetime<%= count %>" id="timeid<%= quizdata.qa_id %>" value="<%= quizdata.usetime %>:00"><span class="countdown<%= quizdata.qa_id %>" ><%= quizdata.usetime %></span></p>
+					
+					 <div> 
+        Time Left :: 
+        <input id="minutes" type="text" style="width: 10px; 
+             border: none; font-size: 16px;  
+            font-weight: bold; color: black;"><font size="5"> : 
+                        </font> 
+        <input id="seconds" type="text" style="width: 20px; 
+                        border: none; font-size: 16px; 
+                        font-weight: bold; color: black;"> 
+    </div> 
+	
+	
+					<p>Options<br> <% new_option = quizdata.option; %>
+						<%  jsonstring = JSON.parse(new_option); %>
+						<% for(var key in jsonstring) { %>
+						<label><input  class="options_<%= quizdata.qa_id %> tblFruits" type="checkbox" name="option" value="<%=  jsonstring[key] %>">&nbsp;&nbsp;<%=  jsonstring[key] %></label> <br>
+					<% } %></p>
+					<input type="submit" class="nextquestdetail" data-queid="<%= quizdata.qa_id %>" data-nextid="<%= countqueans =  count %>"  value="Next">
+				</div>
+		<% count++ }) %>
+		<% } %>
+		<div class="resultdata" style="display:none;" >
+			<p>Result</p>
+			<span class="total"><span>
+		</div>
+    </div>
+</div>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$('input.tblFruits').on('change', function() {
+			$('input.tblFruits').not(this).prop('checked', false);  
+		});
+		var ansque = {};
+		var resultanscount = {};
+		function sum( obj ) {
+			var sum = 0;
+			for( var el in obj ) {
+				if( obj.hasOwnProperty( el ) ) {
+					sum += parseFloat( obj[el] );
+				}
+			}
+			return sum;
+		}			
+		$(document).on('click', '.nextquestdetail', function() {	
+			var currentquest = $(this).attr("data-nextid");
+			var nextquest = parseInt(currentquest) + 1;
+			var totalquest = <%= count %>;
+			var queid = $(this).attr("data-queid");
+			/*var quedataid =$(".queiddata"+nextquest).val();
+			var timer2 = $(".perquetime"+nextquest).val();
+			xyxzzz(timer2,quedataid);*/
+			var opt = $(".options_"+queid+":checked").val();
+			ansque = {'queid' : queid,'answer' : opt};
+			jQuery.ajax({
+					url: "/quiz/checkans",
+					type: "POST",
+					dataType: "json",
+					data: ansque,
+					success: function(result) {
+						resultanscount[queid] = result.right_ans_count;
+					}
+				});	
+			function sum( obj ) {
+			  var sum = 1;
+			  for( var el in obj ) {
+				if( obj.hasOwnProperty( el ) ) {
+				  sum += parseFloat( obj[el] );
+				}
+			  }
+			  return sum;
+			}
+			var summed = sum( resultanscount );
+			if(totalquest==nextquest) {
+				$(".resultdata").show();
+				$(".questshow_"+currentquest).hide();
+				$(".total").html(summed);
+			}
+			else {
+				$(".questshow_"+nextquest).show();
+				$(".questshow_"+currentquest).hide();
+			}
+		});
+		
+		/*var timer2 = $(".perquetime1").val();
+		var quedataid =$(".queiddata1").val();
+		
+		function xyxzzz(timer2,quedataid) {
+			var interval = setInterval(function() {
+			var timer = timer2.split(':');
+			//by parsing integer, I avoid all extra string processing
+			var minutes = parseInt(timer[0], 10);
+			var seconds = parseInt(timer[1], 10);
+			--seconds;
+			minutes = (seconds < 0) ? --minutes : minutes;
+			if (minutes < 0) clearInterval(interval);
+			seconds = (seconds < 0) ? 59 : seconds;
+			seconds = (seconds < 10) ? '0' + seconds : seconds;
+			if(seconds < 0)
+			{
+			 setTimeout
+			}
+			//minutes = (minutes < 10) ?  minutes : minutes;
+			$('.countdown'+quedataid).html(minutes + ':' + seconds);
+			timer2 = minutes + ':' + seconds;
+			}, 1000);
+		}
+		xyxzzz(timer2,quedataid);*/
+
+
+   //set minutes 
+        var mins = 2; 
+  
+        //calculate the seconds 
+        var secs = mins * 60; 
+  
+        //countdown function is evoked when page is loaded 
+        function countdown() { 
+            setTimeout('Decrement()', 60); 
+        } 
+  
+        //Decrement function decrement the value. 
+        function Decrement() { 
+            if (document.getElementById) { 
+                minutes = document.getElementById("minutes"); 
+                seconds = document.getElementById("seconds"); 
+  
+                //if less than a minute remaining 
+                //Display only seconds value. 
+                if (seconds < 59) { 
+                    seconds.value = secs; 
+                } 
+  
+                //Display both minutes and seconds 
+                //getminutes and getseconds is used to 
+                //get minutes and seconds 
+                else { 
+                    minutes.value = getminutes(); 
+                    seconds.value = getseconds(); 
+                } 
+                //when less than a minute remaining 
+                //colour of the minutes and seconds 
+                //changes to red 
+                if (mins < 1) { 
+                    minutes.style.color = "red"; 
+                    seconds.style.color = "red"; 
+                } 
+                //if seconds becomes zero, 
+                //then page alert time up 
+                if (mins < 0) { 
+                    alert('time up'); 
+                    minutes.value = 0; 
+                    seconds.value = 0; 
+                } 
+                //if seconds > 0 then seconds is decremented 
+                else { 
+                    secs--; 
+                    setTimeout('Decrement()', 1000); 
+                } 
+            } 
+        } 
+  
+        function getminutes() { 
+            //minutes is seconds divided by 60, rounded down 
+            mins = Math.floor(secs / 60); 
+            return mins; 
+        } 
+  
+        function getseconds() { 
+            //take minutes remaining (as seconds) away  
+            //from total seconds remaining 
+            return secs - Math.round(mins * 60); 
+        } 
+
+		
+	});	
+</script>
+</body>
+</html>

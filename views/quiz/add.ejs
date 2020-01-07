@@ -1,0 +1,106 @@
+<!--
+including header content which is common for all pages
+-->
+<%- include ../layouts/header.ejs %>	
+<%- include ../layouts/sidebar.ejs %>
+<div class="content-wrapper" style="min-height: 1203.6px;">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1>Add Que Ans.</h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Add Que Ans.</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+    <% if (messages.error) { %>
+      <p style="color:red"><%- messages.error %></p>
+    <% } %>
+    <% if (messages.success) { %>
+      <p style="color:green"><%- messages.success %></p>
+    <% } %>
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- left column -->
+          <div class="col-md-12">
+            <!-- Horizontal Form -->
+            <div class="card card-info">
+              <div class="card-header">
+                <h3 class="card-title">Form</h3>
+              </div>
+              <!-- /.card-header -->
+              <!-- form start -->
+              <form action="/quiz/add" method="POST" class="form-horizontal">
+                <div class="card-body">
+                  <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">Question</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" name="question" id="question" placeholder="Enter Question" value="">
+                    </div>
+                  </div>
+                  <div class="form-group row ">
+                    <label class="col-sm-2 col-form-label">Option</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" name="option[]" id="option" placeholder="Enter Option" value="">
+                    </div>
+                  </div>
+                  <div class="project_images1"></div>
+                  <a href="#" class="add_project_file">Add</a>
+                  <a href="#" class="remove_project_file" style="color: red; display: none;" border="2">Remove</a>
+                  <div class="form-group row ">
+                      <label class="col-sm-2 col-form-label">Answer</label>
+                      <div class="col-sm-10">
+                        <input type="text" class="form-control" name="answer" id="answer" placeholder="Enter Answer" value="">
+                      </div>
+                    </div>
+                    <div class="form-group row ">
+                        <label class="col-sm-2 col-form-label">Time in Min</label>
+                        <div class="col-sm-10">
+                          <input type="text" class="form-control" name="usetime" id="usetime" placeholder="Enter Time" value="00:00:00">
+                        </div>
+                      </div>
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer">
+                  <button type="submit" class="btn btn-info">Submit</button>
+                  <button type="submit" class="btn btn-default float-right">Cancel</button>
+                </div>
+                <!-- /.card-footer -->
+              </form>
+            </div>
+            <!-- /.card -->
+
+          </div>
+          <!--/.col (left) -->
+          <!-- right column -->
+          
+          <!--/.col (right) -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+<%- include ../layouts/footer.ejs %>
+<script>
+  $('.add_project_file').click(function() {
+    $(".project_images1").append('<div class="form-group row project_images"><label class="col-sm-2 col-form-label">Option</label><div class="col-sm-10"><input type="text" class="form-control" name="option[]" id="option" placeholder="Enter Option" value=""></div></div>');
+    $(".remove_project_file").show();
+});
+$('.remove_project_file').click(function() {
+    $('.project_images:last').remove();
+
+});
+
+
+</script>

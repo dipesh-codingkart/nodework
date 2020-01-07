@@ -1,0 +1,325 @@
+<html>
+<head>
+  <title>Front Test</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+<body >
+  <div style="margin:100px;">
+    <nav class="navbar navbar-inverse navbar-static-top">
+      <div class="container">
+        <ul class="nav navbar-nav">
+          <li class="active">
+			<a href="/test">Home</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+	   <section class="content-header">
+	      <div class="container-fluid">
+	        <div class="row mb-2">
+	          <div class="col-sm-6">
+	            <h1>Qestions</h1>
+	          </div>
+	          <div class="col-sm-6">
+	            <div class="breadcrumb float-sm-right">
+	            	<div class="pl-2 float-right" role="group" aria-label="Basic example">
+			            <p  class=" button-unactive  pl-3 pr-3 mr-3">
+						<div class="pr-3"></div>
+			            <div id="timeCountdown_1" class='timer' style="display: inline-flex;" data-seconds-left=0></div><span class="time-left"> Left<span></p>
+			       </div> 
+	            </div>
+	          </div>
+	        </div>
+	      </div><!-- /.container-fluid -->
+	    </section>
+
+      <div class="row"> 
+		<form role="form" class="col-md-12" id="submit_qty_form" action="/submit_qty" method="post" >
+		   <% if (data) { 
+		  	count = 1 
+		  	selectedQues = 1
+		  	count_total = data.length;
+		  	correct_ans = {};
+		  	timer_time = 0;
+		  	timer_time_queId = '';
+  		   %>
+  		    <% if (sess.question_data) { %>
+	  		   <% sess.question_data.quesId  %>
+	  		   <% selectedQues = sess.question_data.quesCount; %>
+	  		   <% correct_ans =  sess.question_data.correct_ans; %>
+ 	  		   <% selectedQues++; %>
+     		   <% } %>
+
+     		<% if (sess.usetime) { %>
+     		<% timer_time = sess.usetime.timer_time  %>
+     		<% timer_time_queId = sess.usetime.quesId  %>
+     		<% } %>
+
+
+			<% data.forEach(function(question){ %>
+
+					<% display='none'; classActive=''; 
+					   ques_time =  question.usetime;
+					%>
+ 				   <%  if(count == selectedQues)
+	 				    { 
+	 				    	if (sess.usetime && timer_time_queId == question.qa_id) {
+						  		ques_time = timer_time;   
+						  	}
+						display='block'; 
+						classActive='activeQuestion'; 
+						}
+					%> 
+
+			    <div class="col-md-12 nextQueSection <%=  classActive %>" data-queId="<%= question.qa_id %>" id="queSection_<%=  count %>" style="display: <%=  display %>;" data-que-time="<%= ques_time %>">
+			    	<% if (question.question_type == 1) { %>
+		          <div class="card card-primary">
+		          	<% }else{ %>
+		          <div class="card card-info">
+				<% } %>
+		            <div class="card-body" style="display: block">
+		            	<!--dddsdd --->
+						<div class="col-md-12" style="margin-left: 50px; ">
+							<h2>Q.<%=  count %> <%= question.question %></h2>
+							<% new_option = question.option; %>
+						<%  jsonstring = JSON.parse(new_option); %>
+						<% for(var key in jsonstring) { %>
+				 			<div class="form-group">
+								 <div class="custom-control custom-radio">
+ 		                          <input  class="tblFruits quesClass_<%= question.qa_id %> custom-control-input" id="question_<%= question.qa_id %>_a" type="checkbox" name="corr_answer[<%= question.qa_id %>]"  value="<%=  jsonstring[key] %>" /> 
+		                          <label for="question_<%= question.qa_id %>_a" class="custom-control-label"><%=  jsonstring[key] %></label>
+		                        </div> 
+							</div>
+						<% } %>	
+						</div>
+						<div class="col-12">
+				          
+				          <% if(count_total == count ) { %>
+				           <input type="submit" style="display: none;" value="Save Changes" class="submitQues btn btn-success "> 
+				           <button type="button" id="nextbtn_<%= count %>" data-quesreq="1" data-queId="<%= question.qa_id %>" data-queCount="<%= count %>" class="btn btn-secondary next_question">Save Answer</button>
+				          <% } else { %>
+				          <button type="button" id="nextbtn_<%= count %>" data-quesreq="1" data-queId="<%= question.qa_id %>" data-queCount="<%= count %>" class="btn btn-secondary next_question">Next</button>
+				          	<% }  %>
+				          	<p id="nextError_<%= count %>" ></p>
+				        </div> 
+						<!--dddsdd --->
+					</div>
+				</div> 
+			</div>  
+ 				 
+			<% count++ }) %>
+			<% } %>
+		 
+ 		</form>
+	</div>
+	</div>
+</div>
+ <script type="text/javascript" src="assets/jquery.simple.timer.js"></script> 
+
+<script type="text/javascript">
+$('input.tblFruits').on('change', function() {
+			$('input.tblFruits').not(this).prop('checked', false);  
+		});
+ 	var selectedQues = '<%= selectedQues %>'; 
+ 	var total_question_count = '<%= count_total %>';  
+  	var correct_ans = '<%- JSON.stringify(correct_ans) %>';
+ 
+ 	var user_correct_ans = {}; 
+ 	if(correct_ans.length > 0 ){ 
+ 		var jsonString = JSON.parse(correct_ans);
+ 		for(index in jsonString){
+ 			var question_str =  jsonString[index];
+ 			question_arr = question_str.split("_");
+ 			if(question_arr.length > 1){
+ 				user_correct_ans[question_arr[0]] = question_str;
+ 			} 
+     	}
+ 	}
+ 	
+    jQuery(document).ready(function(){
+
+	  	var firstTime = jQuery('#queSection_'+selectedQues).attr('data-que-time');
+	  	var time_formet = firstTime.split(":");
+	  	console.log(time_formet); 
+	  	if(time_formet.length == 3){
+	  		var hours = parseInt(time_formet[0]);
+		  	var minutes = parseInt(time_formet[1]);
+		  	var seconds = parseInt(time_formet[2]);
+	  	}else{
+	  		var hours = 0;
+		  	var minutes = parseInt(time_formet[1]);
+		  	var seconds = 0;
+	  	} 
+
+	  	var Coountseconds = (+hours) * 60 * 60 + (+minutes) * 60 + (+seconds); 
+ 
+ 	  	var html = '<div id="timeCountdown_'+selectedQues+'" class="timer" style="display: inline-flex;"   data-seconds-left='+Coountseconds+'></div><span class="time-left"> Left<span>';
+  	    var element = $('#timeCountdown_1').parent();
+		element.find('#timeCountdown_1').remove();
+		element.find('.time-left').remove();
+  		element.append(html); 
+  		
+ 	    jQuery('#timeCountdown_'+selectedQues).startTimer({
+		    onComplete: function(element){
+		        if(jQuery(element).hasClass('timer')){
+	        		jQuery('.nextQueSection.activeQuestion').find('.next_question').attr('data-quesreq', '0');
+	        	    jQuery('.nextQueSection.activeQuestion').find('.next_question').trigger('click');
+	 	        }
+		    } 
+		})  
+ 
+	  	jQuery(document).on('click', '.next_question', function(){
+
+	   		var questionCount = jQuery(this).attr('data-queCount');
+	  		var questionID = jQuery(this).attr('data-queId');
+	  		var quesReq = jQuery(this).attr('data-quesreq');
+	  		console.log( questionCount + questionID);
+	  		var nextQues = parseInt(questionCount)+1;
+	  		
+	   		var quesValues = jQuery(".quesClass_"+questionID);
+	    	var nextQuesTime = jQuery('#queSection_'+nextQues).attr('data-que-time'); 
+	 		var i;
+	 		var isAnswer = false;
+	 		var corrValue = [];
+			for (i = 0; i < quesValues.length; i++) {
+			    if (quesValues[i].checked) {
+			       isAnswer = true;
+			       corrValue.push(quesValues[i].value);
+			      // console.log('isAnswer'+quesValues[i].value)
+			    }else{
+			    	// console.log('Not isAnswer'+quesValues[i].value)
+			    } 
+			}
+	  		if(isAnswer === true || quesReq == 0){
+
+	  			var answerJion = corrValue.join(",");
+	  			user_correct_ans[questionID] = questionID+'_'+answerJion;
+	  			if(total_question_count == questionCount ){
+	        		jQuery('#submit_qty_form').trigger('submit');
+	        	}else{
+
+		  			jQuery('#queSection_'+questionCount).hide();
+		  			jQuery('#queSection_'+nextQues).show();  
+		  			jQuery('.nextQueSection').removeClass('activeQuestion');
+		  			jQuery('#queSection_'+nextQues).addClass('activeQuestion'); 
+		  			console.log(user_correct_ans); 
+		  			var element = $('#timeCountdown_'+questionCount).parent();
+		  			element.find('#timeCountdown_'+questionCount).remove();
+		  			element.find('.time-left').remove();
+		  			var time_formet = nextQuesTime.split(":");
+		  			console.log(time_formet);
+		  			if(time_formet.length == 3){
+				  		var hours = parseInt(time_formet[0]);
+					  	var minutes = parseInt(time_formet[1]);
+					  	var seconds = parseInt(time_formet[2]);
+				  	}else{
+				  		var hours = 0;
+					  	var minutes = parseInt(time_formet[1]);
+					  	var seconds = 0;
+				  	}  
+  				  	var totalSeconds = (+hours) * 60 * 60 + (+minutes) * 60 + (+seconds); 
+
+		  			var html = '<div id="timeCountdown_'+nextQues+'" class="timer" style="display: inline-flex;" data-seconds-left='+totalSeconds+'></div><span class="time-left"> Left<span>';
+		  			element.append(html); 
+		  			jQuery('#timeCountdown_'+nextQues).startTimer({
+					    onComplete: function(element){
+					        // console.log(total_question_count+'hello nextQues '+ nextQues);
+					        if(jQuery(this).hasClass('timer')){
+	 			        		jQuery('.nextQueSection.activeQuestion').find('.next_question').attr('data-quesreq', '0');
+				        	    jQuery('.nextQueSection.activeQuestion').find('.next_question').trigger('click');
+	 				        }
+					    }
+					}) 
+					setCurrentQuestionSession(questionID, questionCount, user_correct_ans);
+		  		}
+				
+		  	}else{
+		  		var errorHtml = "Please select answer.";
+		  		jQuery("#nextError_"+questionCount).text(errorHtml);  
+	  	  	}
+	 	});
+		 
+	    jQuery(document).on('submit', '#submit_qty_form', function(e){
+	  		e.preventDefault();
+
+	        var form_data = {
+	        				 'user_correct_ans' : user_correct_ans
+	        				};
+	        console.log(form_data);
+		    jQuery.ajax({
+	            url: "/submit_qty",
+	            type: "POST",
+	            dataType: "json",
+	            data: form_data,
+	            success: function(data) {
+	              console.log(data);
+	              if(data.status == 1){
+	              	var baseUrl = document.location.origin;
+					console.log(baseUrl);
+	              	window.location.href = baseUrl+"/question_result/"+data.answer_id;
+	              } 
+	            },
+
+	            error: function() {
+	              console.log('process error');
+	            },
+	        });
+	 	})
+
+	 	function setCurrentQuestionSession(qId, qCount, correct_ans){ 
+	 		setCurrentQuestionTime();
+ 	        var ajaxurl = '/setQuestionSession';
+	        var form_data = {
+	        					'qid' : qId,
+	        					'qcount' : qCount,
+	        					'correct_ans' : correct_ans,
+	        					'timer_time' : 0
+	        				}
+	        jQuery.ajax({
+	            url:ajaxurl,
+	            type:'POST',  
+	            dataType: 'json',
+	            data: form_data,
+	            success:function(res){
+	                console.log(res);
+	            } 
+	        });
+	 	}
+
+	 	function setCurrentQuestionTime(){
+
+	 		var qId = jQuery('.nextQueSection.activeQuestion').find('.next_question').attr('data-queid');
+	 		var qCount = jQuery('.nextQueSection.activeQuestion').find('.next_question').attr('data-quecount');
+	 		var hours = jQuery('#timeCountdown_'+qCount).find('.jst-hours').text();
+	 		var minutes = jQuery('#timeCountdown_'+qCount).find('.jst-minutes').text();
+	 		var seconds = jQuery('#timeCountdown_'+qCount).find('.jst-seconds').text();
+	 		var timer_time = hours+minutes+seconds;
+  
+	        var ajaxurl = '/setCurrentQuestionTime';
+	        var form_data = {
+	        					'qid' : qId,
+	        					'qcount' : qCount, 
+	        					'timer_time' : timer_time 
+	        				}
+	        jQuery.ajax({
+	            url:ajaxurl,
+	            type:'POST',  
+	            dataType: 'json',
+	            data: form_data,
+	            success:function(res){
+	                console.log(res);
+	            } 
+	        });  
+ 	 	} 
+
+ 	 	setInterval(function() {
+		      setCurrentQuestionTime();
+		    }, 2000);
+
+   });  
+ 
+</script>
+
